@@ -1,6 +1,7 @@
+import cProfile
 from functools import wraps
 from time import perf_counter_ns
-from random import uniform
+from random import random
 from typing import Any, Callable, Tuple
 
 PROB: float = 0.4
@@ -35,7 +36,7 @@ def flip_biased_coin() -> int:
     int
         0 if the coin lands on tails, 1 if the coin lands on heads.
     """
-    return 0 if uniform(0, 1) < PROB else 1
+    return 0 if random() < PROB else 1
 
 def get_unbiased_run() -> int:
     """Uses the Von Neumann method to generate an unbiase run of coin flips.
@@ -88,13 +89,11 @@ def run_experiment(n: int) -> dict:
         heads, exec_time = generate_unbiased_sequence(SEQ_LEN)
         total_heads += heads
         times += [exec_time]
-    total_time = sum(times)
-    min_time, max_time = min(times), max(times)
     return {
         'avg_heads': total_heads/n,
-        'exec_time': total_time/n,
-        'min_time': min_time,
-        'max_time': max_time
+        'exec_time': sum(times)/n,
+        'min_time': min(times),
+        'max_time': max(times)
     }
 
 def main():
@@ -106,4 +105,5 @@ def main():
     print(f"Execution Time: {runner['exec_time']:.3f} [s] (min: {runner['min_time']:.3f}, max: {runner['max_time']:.3f})")
 
 if __name__ == '__main__':
-    main()
+    #main()
+    cProfile.run('run_experiment(10)')
