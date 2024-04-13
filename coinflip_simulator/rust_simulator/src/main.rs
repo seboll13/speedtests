@@ -1,12 +1,19 @@
+use std::time::{Instant};
 use rand::Rng;
 
 const PROB: f64 = 0.4;
+
+struct ExperimentResult {
+    total_heads: i32,
+    exec_time: f64,
+}
 
 /// Flips a biased coin once and returns the result.
 /// 
 /// Returns:
 /// 0 if the coin lands on tails,
 /// 1 otherwise.
+#[inline]
 fn flip_biased_coin(rng: &mut impl Rng) -> i32 {
     return if rng.gen::<f64>() < PROB { 0 } else { 1 };
 }
@@ -38,12 +45,29 @@ fn generate_unbiased_sequence(length: i32, rng: &mut impl Rng) -> i32 {
     return (0..length).map(|_| get_unbiased_run(rng)).sum();
 }
 
+/// Runs the coin flip experiment a given number of times.
+///
+/// Args:
+/// length: The length of the sequence.
+/// rng: The random number generator.
+///
+/// Returns:
+/// The number of heads in the sequence and the execution time.
+fn run_experiment(_length: i32, rng: &mut impl Rng) -> ExperimentResult {
+    let start_time = Instant::now();
+    let total_heads = generate_unbiased_sequence(1000000, rng);
+    let end_time = Instant::now();
+    return ExperimentResult {
+        total_heads,
+        exec_time: (end_time - start_time).as_secs_f64(),
+    };
+}
+
 /// Main program.
 fn main() {
+    let length = 10;
     let mut rng = rand::thread_rng(); // Use a specific RNG instance
-    let start_time = std::time::Instant::now();
-    let total_heads = generate_unbiased_sequence(1e6 as i32, &mut rng);
-    let end_time = std::time::Instant::now();
-    println!("Total heads: {}", total_heads);
-    println!("Rust Time: {} [s]", (end_time - start_time).as_secs_f64());
+    let res = run_experiment(length, &mut rng);
+    println!("Total heads: {}", res.total_heads);
+    println!("Rust Time: {} [s]", res.exec_time);
 }

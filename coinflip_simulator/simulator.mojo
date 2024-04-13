@@ -38,12 +38,24 @@ fn generate_unbiased_sequence(length: Int) raises -> Int:
         heads += get_unbiased_run()
     return heads
 
-fn main() raises -> NoneType:
-    """Main program.
+fn run_experiment(n: Int) raises -> Tuple[Int, Float64]:
+    """Runs the unbiased coin flip experiment n times.
+
+    Args:
+        n: The number of times to run the experiment.
+    
+    Returns:
+        A tuple of the total number of heads and the time taken to run the experiment.
     """
     var start: Int = time._realtime_nanoseconds()
     var total_heads: Int = generate_unbiased_sequence(1_000_000)
     var end: Int = time._realtime_nanoseconds()
-    print('Total heads:', total_heads)
-    print('Mojo Time:', (end-start)/1e9, '[s]')
+    return total_heads, Float64((end-start)/1e9)
+
+fn main() raises -> NoneType:
+    """Main program.
+    """
+    var res: Tuple[Int, Float64] = run_experiment(1)
+    print("Total heads:", res.get[0, Int]())
+    print("Mojo Time:", res.get[1, Float64](), "[s]")
     

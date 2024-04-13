@@ -5,10 +5,13 @@ MOJO = mojo
 NODE = node
 CARGO = cargo
 RUST_PATH = rust_simulator/
+C_DIR = c_simulator
 
-all: simulator cargo_build
+all: build run
 
-run: all python mojo node simulator_execute cargo_execute
+build: c_build cargo_build
+
+run: python mojo node c_execute cargo_execute
 
 python:
 	$(PYTHON) simulator.py
@@ -20,14 +23,16 @@ node:
 	$(NODE) simulator.js
 
 # C build and execution
-simulator: simulator.o
+c_build: $(C_DIR)/simulator
+
+$(C_DIR)/simulator: simulator.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-simulator.o: simulator.c
+simulator.o: $(C_DIR)/simulator.c
 	$(CC) $(CFLAGS) -c $<
 
-simulator_execute:
-	./simulator
+c_execute:
+	./$(C_DIR)/simulator
 
 # Rust build and execution
 cargo_build:
@@ -38,7 +43,7 @@ cargo_execute:
 
 # Cleanup build artifacts
 clean:
-	rm -f *.o simulator
+	rm -rf *.o c_build
 	cd $(RUST_PATH) && $(CARGO) clean
 	clear
 

@@ -39,8 +39,19 @@ function generateUnbiasedSequence(length) {
     return heads;
 }
 
-let start = Date.now();
-let total_heads = generateUnbiasedSequence(1e6);
-let end = Date.now();
-console.log(`Total number of heads: ${total_heads}`);
-console.log(`JS Time: ${(end - start)/1000} [s]`);
+/**
+ * Runs the experiment of generating an unbiased sequence of coin flips a given # of times.
+ * 
+ * @param {number} n number of experiments 
+ * @returns {Array} [total_heads, time_elapsed]
+ */
+function runExperiment(n) {
+    let start = performance.now();
+    let total_heads = generateUnbiasedSequence(1e6);
+    let end = performance.now();
+    return [total_heads, (end-start)/1000];
+}
+
+let res = runExperiment(10);
+console.log(`Total number of heads: ${res[0]}`);
+console.log(`JS Time: ${res[1]} [s]`);
