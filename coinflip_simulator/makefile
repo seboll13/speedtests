@@ -1,17 +1,21 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -g
 PYTHON = python3
 MOJO = mojo
 NODE = node
+JAVA = java
+JAVAC = javac
+JAVA_SRC = java_simulator
+JAVA_MAIN = coinflip_simulator.java_simulator.Main
 CARGO = cargo
 RUST_PATH = rust_simulator/
+CC = gcc
+CFLAGS = -Wall -Wextra -g
 C_DIR = c_simulator
 
 all: build run
 
 build: c_build cargo_build
 
-run: python mojo node c_execute cargo_execute
+run: python mojo node java gcc rust
 
 python:
 	$(PYTHON) simulator.py
@@ -22,7 +26,18 @@ mojo:
 node:
 	$(NODE) simulator.js
 
+# Java build and execution
+java: java_compile java_execute
+
+java_compile:
+	$(JAVAC) -d . $(JAVA_SRC)/Main.java
+
+java_execute:
+	$(JAVA) -cp . $(JAVA_MAIN)
+
 # C build and execution
+gcc: c_build c_execute
+
 c_build: $(C_DIR)/simulator
 
 $(C_DIR)/simulator: simulator.o
@@ -35,6 +50,8 @@ c_execute:
 	./$(C_DIR)/simulator
 
 # Rust build and execution
+rust: cargo_build cargo_execute
+
 cargo_build:
 	cd $(RUST_PATH) && $(CARGO) build --release
 
@@ -43,7 +60,8 @@ cargo_execute:
 
 # Cleanup build artifacts
 clean:
-	rm -rf *.o c_build
+	find . \( -name "*.class" -o -name "*.o" \) -type f -delete
+	cd $(C_DIR) && rm -f simulator
 	cd $(RUST_PATH) && $(CARGO) clean
 	clear
 
