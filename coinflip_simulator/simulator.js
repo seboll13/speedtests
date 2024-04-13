@@ -1,4 +1,5 @@
 let PROB = 0.4;
+let SEQ_LEN = 1000000;
 
 /**
  * Flips a biased coin once and returns the result.
@@ -43,15 +44,37 @@ function generateUnbiasedSequence(length) {
  * Runs the experiment of generating an unbiased sequence of coin flips a given # of times.
  * 
  * @param {number} n number of experiments 
- * @returns {Array} [total_heads, time_elapsed]
+ * @returns {Object} an object containing the average number of heads and some statistics about the execution time
  */
 function runExperiment(n) {
-    let start = performance.now();
-    let total_heads = generateUnbiasedSequence(1e6);
-    let end = performance.now();
-    return [total_heads, (end-start)/1000];
+    let totalHeads = 0;
+    let times = [];
+    for (let i = 0; i < n; i++) {
+        let start = performance.now();
+        let heads = generateUnbiasedSequence(SEQ_LEN);
+        let end = performance.now();
+        totalHeads += heads;
+        times.push((end - start) / 1000);
+    }
+    let totalTime = times.reduce((a, b) => a + b, 0);
+    let minTime = Math.min(...times);
+    let maxTime = Math.max(...times);
+    return {
+        avgHeads: totalHeads/n,
+        execTime: totalTime/n,
+        minTime: minTime,
+        maxTime: maxTime
+    };
 }
 
-let res = runExperiment(10);
-console.log(`Total number of heads: ${res[0]}`);
-console.log(`JS Time: ${res[1]} [s]`);
+/**
+ * Main function to run the experiment and print the results.
+ */
+function main() {
+    console.log('============ Running JavaScript Experiment ============');
+    let runner = runExperiment(10);
+    console.log(`Average Heads : ${Math.floor(runner.avgHeads)}`);
+    console.log(`Execution Time: ${runner.execTime.toFixed(3)} [s] (min: ${runner.minTime.toFixed(3)}, max: ${runner.maxTime.toFixed(3)})`);
+}
+
+main();

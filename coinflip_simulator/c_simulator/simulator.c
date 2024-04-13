@@ -3,11 +3,16 @@
 #include <stdio.h>
 
 #define PROB 0.4
+#define SEQ_LEN 1000000
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 // Struct to store the result of an experiment
-typedef struct ExperimentResult {
-    int heads;
-    float time;
+typedef struct {
+    int avg_heads;
+    float exec_time;
+    float min_time;
+    float max_time;
 } ExperimentResult;
 
 /**
@@ -55,11 +60,28 @@ int generate_unbiased_sequence(int length) {
  * @return ExperimentResult with the number of heads and the time taken
  */
 ExperimentResult run_experiment(int length) {
-    int start = clock();
-    int total_heads = generate_unbiased_sequence(1e6);
-    int end = clock();
-    ExperimentResult result = {total_heads, (double)(end - start) / CLOCKS_PER_SEC};
-    return result;
+    int total_heads = 0;
+    double times[length];
+    double total_time = 0;
+    double min_time = 1e9;
+    double max_time = 0.0;
+    for (int i = 0; i < length; i++) {
+        clock_t start = clock();
+        int heads = generate_unbiased_sequence(SEQ_LEN);
+        clock_t end = clock();
+        double exec_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+        total_heads += heads;
+        total_time += exec_time;
+        min_time = MIN(min_time, exec_time);
+        max_time = MAX(max_time, exec_time);
+        times[i] = exec_time;
+    }
+    return (ExperimentResult) {
+        .avg_heads = total_heads / length,
+        .exec_time = total_time / length,
+        .min_time = min_time,
+        .max_time = max_time
+    };
 }
 
 /**
@@ -67,7 +89,9 @@ ExperimentResult run_experiment(int length) {
 */
 int main() {
     srand(time(NULL));
-    ExperimentResult result = run_experiment(1e6);
-    printf("Number of heads: %d\n", result.heads);
-    printf("C Time: %f [s]\n", result.time);
+    printf("============ Running C Experiment ============\n");
+    ExperimentResult res = run_experiment(10);
+    printf("Average Heads : %d\n", (int)res.avg_heads);
+    printf("Execution Time: %.3f [s] (min: %.3f, max: %.3f)\n", res.exec_time, res.min_time, res.max_time);
+    return 0;
 }

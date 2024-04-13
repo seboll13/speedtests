@@ -4,6 +4,7 @@ from random import uniform
 from typing import Any, Callable, Tuple
 
 PROB: float = 0.4
+SEQ_LEN: int = 1_000_000
 
 def timer(func) -> Callable[..., Tuple[Any, float]]:
     """Decorator function to measure the execution time of a function.
@@ -67,12 +68,42 @@ def generate_unbiased_sequence(length: int) -> Tuple[int, float]:
     """
     return sum(get_unbiased_run() for _ in range(length))
 
+def run_experiment(n: int) -> dict:
+    """Runs the unbiased sequence generation experiment n times.
+    
+    Parameters
+    ----------
+    n : int
+        The number of times to run the experiment.
+    
+    Returns
+    ----------
+    dict
+        A dictionary containing the average number of heads as well as some statistics
+        about the execution time of the experiment.
+    """
+    total_heads = 0
+    times = []
+    for _ in range(n):
+        heads, exec_time = generate_unbiased_sequence(SEQ_LEN)
+        total_heads += heads
+        times += [exec_time]
+    total_time = sum(times)
+    min_time, max_time = min(times), max(times)
+    return {
+        'avg_heads': total_heads/n,
+        'exec_time': total_time/n,
+        'min_time': min_time,
+        'max_time': max_time
+    }
+
 def main():
     """Main program.
     """
-    total_heads, exec_time = generate_unbiased_sequence(1_000_000)
-    print(f'Total heads: {total_heads}')
-    print(f"Python Time: {exec_time} [s]")
+    print('============ Running Python Experiment ============')
+    runner = run_experiment(10)
+    print(f'Average Heads : {int(runner["avg_heads"])}')
+    print(f"Execution Time: {runner['exec_time']:.3f} [s] (min: {runner['min_time']:.3f}, max: {runner['max_time']:.3f})")
 
 if __name__ == '__main__':
     main()

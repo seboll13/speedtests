@@ -1,6 +1,7 @@
 package coinflip_simulator.java_simulator;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
+import java.util.DoubleSummaryStatistics;
 import java.util.logging.Level;
 
 public class Main {
@@ -45,11 +46,20 @@ public class Main {
      * @param n number of times to run the experiment
      * @return a pair of the total number of heads and the time taken to run the experiment
      */
-    Pair<Integer, Double> runSimulation(int n) {
-        long start = System.nanoTime();
-        int totalHeads = generateUnbiasedSequence(1000000);
-        long end = System.nanoTime();
-        return new Pair<>(totalHeads, (end - start)/1e9);
+    ExperimentResult runSimulation(int n) {
+        int totalHeads = 0;
+        double[] times = new double[n];
+        for (int i = 0; i < n; i++) {
+            long start = System.nanoTime();
+            totalHeads += generateUnbiasedSequence(1000000);
+            long end = System.nanoTime();
+            times[i] = (end - start)/1e9;
+        }
+        double avgHeads = totalHeads / (double) n;
+        DoubleSummaryStatistics stats = IntStream.range(0, n).mapToDouble(i -> times[i]).summaryStatistics();
+        return new ExperimentResult(
+            avgHeads, stats.getAverage(), stats.getMin(), stats.getMax()
+        );
     }
 
     /**
@@ -59,8 +69,10 @@ public class Main {
     public static void main(String[] args) {
         logger.setLevel(Level.INFO);
         Main main = new Main();
-        Pair<Integer, Double> res = main.runSimulation(10);
-        logger.log(Level.INFO, "Total heads: {0}", res.t);
-        logger.log(Level.INFO, "Java Time: {0} [s]", res.u);
+        ExperimentResult res = main.runSimulation(10);
+        logger.log(Level.INFO, "============ Running Java Experiment ============");
+        logger.log(Level.INFO, "Average Heads : {0}", res.getAvgHeads());
+        logger.log(Level.INFO, "Execution Time: {0} [s] (min: {1}, max: {2})", new Object[]{res.getAvgTime(), res.getMinTime(), res.getMaxTime()});
+        
     }
 }

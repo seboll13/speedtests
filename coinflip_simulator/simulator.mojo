@@ -1,5 +1,6 @@
 from time import time
-from random import random_float64
+from random import random_float64, seed
+from collections import Dict, List
 
 
 fn flip_biased_coin() raises -> Int:
@@ -38,7 +39,7 @@ fn generate_unbiased_sequence(length: Int) raises -> Int:
         heads += get_unbiased_run()
     return heads
 
-fn run_experiment(n: Int) raises -> Tuple[Int, Float64]:
+fn run_experiment(n: Int) raises -> Dict[String, Float64]:
     """Runs the unbiased coin flip experiment n times.
 
     Args:
@@ -47,15 +48,37 @@ fn run_experiment(n: Int) raises -> Tuple[Int, Float64]:
     Returns:
         A tuple of the total number of heads and the time taken to run the experiment.
     """
-    var start: Int = time._realtime_nanoseconds()
-    var total_heads: Int = generate_unbiased_sequence(1_000_000)
-    var end: Int = time._realtime_nanoseconds()
-    return total_heads, Float64((end-start)/1e9)
+    var total_heads: Int = 0
+    var total_time: Float64 = 0.0
+    var min_time: Float64 = 0.0
+    var max_time: Float64 = 0.0
+    var times: List[Float64] = List[Float64]()
+    for idx in range(n):
+        var start: Float64 = time._realtime_nanoseconds()
+        total_heads += generate_unbiased_sequence(1_000_000)
+        var end: Float64 = time._realtime_nanoseconds()
+        var elapsed: Float64 = (end - start) / 1e9
+        if idx == 0:
+            min_time = elapsed
+            max_time = elapsed
+        times.append(elapsed)
+        total_time += elapsed
+        if elapsed < min_time:
+            min_time = elapsed
+        if elapsed > max_time:
+            max_time = elapsed
+    var stats: Dict[String, Float64] = Dict[String, Float64]()
+    stats["avg_heads"] = total_heads / n
+    stats["exec_time"] = total_time / n
+    stats["min_time"] = min_time
+    stats["max_time"] = max_time
+    return stats
 
 fn main() raises -> NoneType:
     """Main program.
     """
-    var res: Tuple[Int, Float64] = run_experiment(1)
-    print("Total heads:", res.get[0, Int]())
-    print("Mojo Time:", res.get[1, Float64](), "[s]")
+    print("============ Running Mojo Experiment ============")
+    var res: Dict[String, Float64] = run_experiment(10)
+    print('Average Heads : ', res['avg_heads'].to_int())
+    print('Execution Time: ', res['exec_time'], '[s] (min: ', res['min_time'], ', max: ', res['max_time'], ')')
     
