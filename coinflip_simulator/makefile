@@ -30,7 +30,7 @@ node:
 java: java_compile java_execute
 
 java_compile:
-	$(JAVAC) -d . $(JAVA_SRC)/Main.java
+	$(JAVAC) -d . $(JAVA_SRC)/*.java
 
 java_execute:
 	$(JAVA) -cp . $(JAVA_MAIN)

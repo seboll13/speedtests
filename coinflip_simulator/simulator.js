@@ -10,8 +10,8 @@ function flipBiasedCoin() {
 }
 
 /**
- * Uses the Von Neumann method to generate an unbiase run of coin flips. 
- * The function loops over a pair of biased coins flips until both flips are different.
+ * Uses the Von Neumann method to generate an unbiased run of coin flips. 
+ * The function loops over a pair of biased coin flips until both flips are different.
  * 
  * @returns {number} 0 if the run is HT, 1 if the run is TH
  */
