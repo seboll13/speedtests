@@ -1,40 +1,28 @@
 # Unbiased Coin Simulation
 
-This project simulates an unbiased coin run using a biased coin across multiple programming languages. It showcases the implementation of the Von Neumann method for generating an unbiased sequence of coin flips from a biased coin. Supported languages include Python, C, JavaScript, and Mojo, with Rust coming soon.
+This project simulates an unbiased coin run using a biased coin across multiple programming languages. It showcases the implementation of the Von Neumann method for generating an unbiased sequence of coin flips from a biased coin. Supported languages include Python, Mojo, Java, JavaScript, C, and Rust. The idea is to optimise the simulation for speed and efficiency across all languages and compare the results.
 
 ## Project Structure
 
 - `simulator.py`: Python implementation.
-- `simulator.c`: C implementation.
-- `simulator.js`: JavaScript implementation.
 - `simulator.mojo`: Mojo implementation.
+- `simulator.js`: JavaScript implementation.
+- The C, Rust and Java implementations are all located in their respective directories, named `x_simulator`, where `x` is the language name.
 - `Makefile`: Contains commands for compiling and executing the simulations.
 
 ## Prerequisites
 
 Ensure you have the following installed:
-- Python
 - GCC (for C)
-- Node.js (for JavaScript)
+- Python 3.9+
+- Java (for Java)
+- Cargo (for Rust)
 - Mojo Runtime (for Mojo)
+- Node.js (for JavaScript)
 
 ## Usage
 
-To compile and run the simulations across all languages:
-```
-make all
-make execute
-```
-
-To run a specific simulation:
-- For Python: `make python`
-- For Mojo: `make mojo`
-- For Node.js: `make node`
-
-To clean the directory (remove compiled files):
-```
-make clean
-```
+Type ```make all``` to compile and run the simulations across all languages. If you wish to only run a specific simulation, type ```make x```, where `x` is the language name. For example, to run the Python simulation, type ```make python```. Run ```make clean``` to remove compiled files.
 
 ## Contributing
 
